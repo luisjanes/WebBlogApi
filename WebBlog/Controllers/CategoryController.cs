@@ -36,7 +36,7 @@ namespace WebBlog.Controllers
             }
             catch (DbUpdateException ex)
             {
-                return StatusCode(500, "01X01 - Couldn't get this Category");
+                return StatusCode(500, "01X02 - Couldn't get this Category");
             }
 
         }
@@ -51,7 +51,7 @@ namespace WebBlog.Controllers
             }
             catch(DbUpdateException ex)
             {
-                return StatusCode(500, "01X01 - Couldn't create this Category");
+                return StatusCode(500, "01X03 - Couldn't create this Category");
             }
             catch (Exception ex)
             {
@@ -76,7 +76,7 @@ namespace WebBlog.Controllers
             }
             catch (DbUpdateException ex)
             {
-                return StatusCode(500, "01X01 - Couldn't update this Category");
+                return StatusCode(500, "01X04 - Couldn't update this Category");
             }
             catch (Exception ex)
             {
@@ -100,7 +100,7 @@ namespace WebBlog.Controllers
             }
             catch (DbUpdateException ex)
             {
-                return StatusCode(500, "01X01 - Couldn't delete this Category");
+                return StatusCode(500, "01X05 - Couldn't delete this Category");
             }
             catch (Exception ex)
             {
