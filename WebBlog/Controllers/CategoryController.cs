@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using WebBlog.Data;
 using WebBlog.Models;
+using WebBlog.ViewModels;
 
 namespace WebBlog.Controllers
 {
@@ -16,7 +17,7 @@ namespace WebBlog.Controllers
                 var categories = await _context.Categories.ToListAsync();
                 return Ok(categories);
             }
-            catch (DbUpdateException ex)
+            catch (Exception ex)
             {
                 return StatusCode(500, "01X01 - Couldn't get this Categories");
             }
@@ -41,13 +42,20 @@ namespace WebBlog.Controllers
 
         }
         [HttpPost("v1/categories")]
-        public async Task<IActionResult> PostAsync([FromBody] Category model,[FromServices] BlogDataContext _context)
+        public async Task<IActionResult> PostAsync([FromBody] EditorCategoryViewModel model,[FromServices] BlogDataContext _context)
         {
             try
             {
-                await _context.Categories.AddAsync(model);
+                var category = new Category
+                {
+                    Id = 0,
+                    Posts = [],
+                    Name = model.Name,
+                    Slug = model.Slug.ToLower(),
+                };
+                await _context.Categories.AddAsync(category);
                 await _context.SaveChangesAsync();
-                return Created($"v1/categories/{model.Id}", model);
+                return Created($"v1/categories/{category.Id}", category);
             }
             catch(DbUpdateException ex)
             {
@@ -59,7 +67,7 @@ namespace WebBlog.Controllers
             }
         }
         [HttpPut("v1/categories/{id:int}")]
-        public async Task<IActionResult> PutAsync([FromRoute] int id, [FromServices] BlogDataContext _context, [FromBody]Category model)
+        public async Task<IActionResult> PutAsync([FromRoute] int id, [FromServices] BlogDataContext _context, [FromBody]EditorCategoryViewModel model)
         {
             try
             {
