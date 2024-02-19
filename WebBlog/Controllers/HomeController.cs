@@ -13,7 +13,7 @@ namespace WebBlog.Controllers
             return Ok(new
             {
                 Name = "TiltanesAPI",
-                Version = "1.0.0",
+                Version = "1.0.1",
             });
         }
     }
