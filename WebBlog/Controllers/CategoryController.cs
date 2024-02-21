@@ -83,7 +83,7 @@ namespace WebBlog.Controllers
                 category.Slug = model.Slug;
                 _context.Categories.Update(category);
                 await _context.SaveChangesAsync();
-                return Ok(new ResultViewModel<Category>(category));
+                return Ok(new ResultViewModel<EditorCategoryViewModel>(model));
             }
             catch (DbUpdateException ex)
             {
