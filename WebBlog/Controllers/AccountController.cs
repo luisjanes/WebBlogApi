@@ -15,9 +15,9 @@ namespace WebBlog.Controllers
     public class AccountController : ControllerBase
     {
         [HttpPost("v1/accounts/")]
-        public async Task<IActionResult> Post([FromBody]RegisterViewModel model, [FromServices] BlogDataContext _context)
+        public async Task<IActionResult> Post([FromBody] RegisterViewModel model, [FromServices] BlogDataContext _context)
         {
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 return BadRequest(new ResultViewModel<string>(ModelState.GetErrors()));
             }
@@ -25,11 +25,11 @@ namespace WebBlog.Controllers
             {
                 Name = model.Name,
                 Email = model.Email,
-                Slug = model.Email.Replace("@","-").Replace(".","-"),
+                Slug = model.Email.Replace("@", "-").Replace(".", "-"),
             };
 
             var password = PasswordGenerator.Generate(25);
-            user.PasswordHash= PasswordHasher.Hash(password);
+            user.PasswordHash = PasswordHasher.Hash(password);
 
             try
             {
@@ -38,7 +38,8 @@ namespace WebBlog.Controllers
 
                 return Ok(new ResultViewModel<dynamic>(new
                 {
-                    user = user.Email, password
+                    user = user.Email,
+                    password
                 }));
             }
             catch (DbUpdateException)
@@ -51,12 +52,38 @@ namespace WebBlog.Controllers
             }
         }
         //[AllowAnonymous] para permitir que utilizem sem autenticação
-        [HttpPost("v1/login")]
-        public IActionResult Login([FromServices] TokenService tokenService)
+        [HttpPost("v1/accounts/login")]
+        public async Task<IActionResult> Login(
+            [FromBody] LoginViewModel model,
+            [FromServices] BlogDataContext _context,
+            [FromServices] TokenService tokenService)
         {
-            var token = tokenService.GenerateToken(null);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new ResultViewModel<string>(ModelState.GetErrors()));
+            }
 
-            return Ok(token);
+            var user = await _context
+                .Users
+                .AsNoTracking()
+                .Include(x => x.Roles)
+                .FirstOrDefaultAsync(x => x.Email == model.Email);
+
+            if (user == null)
+                return StatusCode(401, new ResultViewModel<string>("Usuário ou senha inválida"));
+
+            if (!PasswordHasher.Verify(user.PasswordHash, model.Password))
+                return StatusCode(401, new ResultViewModel<string>("Usuário ou senha inválida"));
+
+            try
+            {
+                var token = tokenService.GenerateToken(user);
+                return Ok(new ResultViewModel<string>(token, null));
+            }
+            catch
+            {
+                return StatusCode(500, new ResultViewModel<string>("Falha interna do servidor"));
+            }
         }
 
         //[Authorize(Roles = "user")]

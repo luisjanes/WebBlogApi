@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.Blazor;
+using WebBlog.Attributes;
 
 namespace WebBlog.Controllers
 {
@@ -8,6 +9,7 @@ namespace WebBlog.Controllers
     public class HomeController : ControllerBase
     {
         [HttpGet("")]
+        //[ApiKey]
         public IActionResult Get()
         {
             return Ok(new
