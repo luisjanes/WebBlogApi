@@ -18,6 +18,7 @@ LoadConfiguration(app);
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+app.UseStaticFiles();
 app.Run();
 
 void LoadConfiguration(WebApplication app)
@@ -25,6 +26,7 @@ void LoadConfiguration(WebApplication app)
     Configuration.JwtKey = app.Configuration.GetValue<string>("JwtKey");
     Configuration.ApiKeyName = app.Configuration.GetValue<string>("ApiKeyName");
     Configuration.ApiKey = app.Configuration.GetValue<string>("ApiKey");
+    Configuration.LocalHostPath = app.Configuration.GetValue<string>("LocalHostPath");
 
     var smtp = new Configuration.SmtpConfiguration();
     app.Configuration.GetSection("Smtp").Bind(smtp);
@@ -67,4 +69,5 @@ void ConfigureServices(WebApplicationBuilder builder)
     builder.Services.AddTransient<TokenService>(); //Sempre vai gerar um novo
     //builder.Services.AddSingleton(); //1 por app!
     //builder.Services.AddScoped(); //Vai durar por requisição
+    builder.Services.AddTransient<EmailService>();
 }
