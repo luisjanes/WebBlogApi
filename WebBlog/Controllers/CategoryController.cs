@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using WebBlog.Data;
 using WebBlog.Extensions;
 using WebBlog.Models;
@@ -12,11 +13,17 @@ namespace WebBlog.Controllers
     public class CategoryController : ControllerBase
     {
         [HttpGet("v1/categories")]
-        public async Task<IActionResult> GetAsync([FromServices] BlogDataContext _context)
+        public async Task<IActionResult> GetAsync(
+            [FromServices]IMemoryCache memoryCache,
+            [FromServices] BlogDataContext _context)
         {
             try
             {
-                var categories = await _context.Categories.ToListAsync();
+                var categories = memoryCache.GetOrCreate("CategoriesCache", entry =>
+                {
+                    entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(1);
+                    return _context.Categories.ToList();
+                });
                 return Ok(new ResultViewModel<List<Category>>(categories));
             }
             catch
