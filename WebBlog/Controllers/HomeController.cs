@@ -10,12 +10,15 @@ namespace WebBlog.Controllers
     {
         [HttpGet("")]
         //[ApiKey]
-        public IActionResult Get()
+        public IActionResult Get(
+            [FromServices]IConfiguration config)
         {
+            var env = config.GetValue<string>("Env");
             return Ok(new
             {
                 Name = "TiltanesAPI",
                 Version = "1.0.1",
+                Environment = env
             });
         }
     }
